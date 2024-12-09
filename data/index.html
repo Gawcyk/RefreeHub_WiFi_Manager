@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Referee Hub Configuration</title>
+  <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Konfiguracja Wi-Fi</h1>
+    <div class="col">
+      <h2>Zapisane sieci Wi-Fi</h2>
+      <ul id="saved-networks-list"></ul> <!-- Lista zapisanych sieci -->
+      <button onclick="refreshSavedNetworks()">Odśwież zapisane sieci</button>
+      <h2>Dostępne sieci</h2>
+      <ul id="wifi-list"></ul>
+    </div>
+    <div class="col">
+      <input type="text" id="ssid" placeholder="Wybrane SSID">
+      <div class="password-container">
+        <input type="password" id="password" placeholder="Hasło sieci Wi-Fi">
+        <span class="toggle-password" onclick="togglePassword('password')">&#128065;</span> <!-- Oczko -->
+      </div>
+      <button onclick="saveNetwork()">Zapisz sieć</button>
+      <button onclick="removeNetwork()">Usuń wybraną sieć</button>
+      <button onclick="connectWiFi()">Połącz z siecią Wi-Fi</button>
+    </div>
+    <div class="col">
+      <h2>Ustawienia MQTT</h2>
+      <input type="text" id="mqtt_server" placeholder="Adres serwera MQTT">
+      <input type="text" id="mqtt_port" placeholder="Port MQTT (domyślnie 1883)" value="1883">
+      <input type="text" id="mqtt_user" placeholder="Użytkownik MQTT">
+      <div class="password-container">
+        <input type="password" id="mqtt_password" placeholder="Hasło MQTT">
+        <span class="toggle-password" onclick="togglePassword('mqtt_password')">&#128065;</span> <!-- Oczko -->
+      </div>
+      <button onclick="saveMQTT()">Zapisz ustawienia MQTT</button>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>

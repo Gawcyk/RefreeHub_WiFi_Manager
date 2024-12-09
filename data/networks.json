@@ -1,0 +1,12 @@
+{
+    "networks":[
+        {
+            "ssid" : "PawelTel",
+            "password": "607065368"
+        },
+        {
+            "ssid":"Ochman_Dom",
+            "password":"Jaroslaw"
+        }
+    ]
+}
