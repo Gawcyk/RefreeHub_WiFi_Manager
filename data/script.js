@@ -18,18 +18,7 @@
         });
       });
     }
-
     
-
-    function saveMQTT() {
-      const server = document.getElementById('mqtt_server').value;
-      const port = document.getElementById('mqtt_port').value;
-      const user = document.getElementById('mqtt_user').value;
-      const password = document.getElementById('mqtt_password').value;
-      fetch(`/mqtt?server=${encodeURIComponent(server)}&port=${encodeURIComponent(port)}&user=${encodeURIComponent(user)}&password=${encodeURIComponent(password)}`)
-        .then(response => response.text())
-        .then(alert);
-    }
 
     function togglePassword(fieldId) {
       const passwordField = document.getElementById(fieldId);
@@ -92,29 +81,6 @@ function selectNetwork(index) {
   document.getElementById('password').value = selectedNetwork.password; // Hasło nie jest wyświetlane
 }
 
-// Zapisz nową sieć
-function saveNetwork() {
-  const ssid = document.getElementById('ssid').value;
-  const password = document.getElementById('password').value;
-
-  if (!ssid) {
-    alert('Wprowadź SSID sieci.');
-    return;
-  }
-  
-  fetch(`/save_network`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ ssid, password })
-  })
-    .then(response => response.text())
-    .then(message => {
-      alert(message);
-      refreshSavedNetworks();
-    })
-    .catch(error => console.error('Błąd podczas zapisywania sieci:', error));
-}
-
 // Usuń wybraną sieć
 function removeNetwork() {
   const ssid = document.getElementById('ssid').value;
@@ -137,7 +103,7 @@ function removeNetwork() {
     .catch(error => console.error('Błąd podczas usuwania sieci:', error));
 }
 
-// Połącz z wybraną siecią
+// Funkcja do połączenia z Wi-Fi
 function connectWiFi() {
   const ssid = document.getElementById('ssid').value;
   const password = document.getElementById('password').value;
@@ -147,7 +113,7 @@ function connectWiFi() {
     return;
   }
 
-  fetch(`/connect`, {
+  fetch('/connect', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ ssid, password })
@@ -156,13 +122,43 @@ function connectWiFi() {
     .then(message => showNotification(message, message.includes('Połączono')))
     .catch(error => console.error('Błąd podczas łączenia z siecią Wi-Fi:', error));
 }
-function connectWiFi() {
+
+// Ogólna funkcja zapisywania danych (sieci Wi-Fi, MQTT)
+function saveData(endpoint, payload, successMessage) {
+  fetch(endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+    .then(response => response.text())
+    .then(message => {
+      showNotification(successMessage || message, true);
+      if (endpoint === '/save_network') refreshSavedNetworks();
+    })
+    .catch(error => console.error(`Błąd podczas zapisu danych: ${error}`));
+}
+
+function saveNetwork() {
   const ssid = document.getElementById('ssid').value;
   const password = document.getElementById('password').value;
-  fetch(`/connect?ssid=${encodeURIComponent(ssid)}&password=${encodeURIComponent(password)}`)
-    .then(response => response.text())
-    .then(message => showNotification(message, message.includes('Połączono')));
+
+  if (!ssid) {
+    alert('Wprowadź SSID sieci.');
+    return;
+  }
+
+  saveData('/save_network', { ssid, password }, 'Sieć Wi-Fi zapisana.');
 }
+
+function saveMQTT() {
+  const server = document.getElementById('mqtt_server').value;
+  const port = document.getElementById('mqtt_port').value;
+  const user = document.getElementById('mqtt_user').value;
+  const password = document.getElementById('mqtt_password').value;
+
+  saveData('/mqtt', { server, port, user, password }, 'Ustawienia MQTT zapisane.');
+}
+
 
     // Odśwież zapisane sieci przy starcie
     refreshSavedNetworks();

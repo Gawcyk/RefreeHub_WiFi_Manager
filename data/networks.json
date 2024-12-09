@@ -1,5 +1,5 @@
 {
-    "networks":[
+    "networks": [
         {
             "ssid" : "PawelTel",
             "password": "607065368"
@@ -10,3 +10,4 @@
         }
     ]
 }
+  

@@ -102,7 +102,7 @@ MQTTConfig mqttConfig;
 void saveNetworksToFile()
 {
   JsonDocument doc;
-  JsonArray array = doc["networks"].to<JsonArray>();
+  JsonArray array = doc.to<JsonArray>();
 
   for (const auto &network : savedNetworks)
   {
@@ -132,30 +132,30 @@ void loadNetworksFromFile()
 {
   if (!LittleFS.exists(networksFile))
   {
-    Serial.println("Plik sieci Wi-Fi nie istnieje.");
+    Serial.println("Brak zapisanych sieci Wi-Fi.");
     return;
   }
 
   File file = LittleFS.open(networksFile, FILE_READ);
   if (!file)
   {
-    Serial.println("Nie udało się otworzyć pliku sieci Wi-Fi.");
+    Serial.println("Nie można otworzyć pliku zapisanych sieci.");
     return;
   }
 
   JsonDocument doc;
   DeserializationError error = deserializeJson(doc, file);
+  file.close();
+
   if (error)
   {
     Serial.println("Błąd odczytu zapisanych sieci Wi-Fi.");
-    file.close();
     return;
   }
-  file.close();
 
-  JsonArray array = doc["networks"];
+  // JsonArray array = doc["networks"];
   int i = 0;
-  for (JsonObject obj : array)
+  for (JsonObject obj : doc.as<JsonArray>())
   {
     if (i >= 5)
       break; // Maksymalnie 5 sieci
@@ -164,7 +164,7 @@ void loadNetworksFromFile()
     i++;
   }
 
-  Serial.println("Wczytano zapisane sieci Wi-Fi.");
+  Serial.println("Sieci Wi-Fi załadowane pomyślnie.");
 }
 
 // Funkcja do zapisu konfiguracji
@@ -670,6 +670,30 @@ void ServerSetupEndpoint()
     mqttClient.setServer(mqttConfig.server.toString().c_str(), mqttConfig.port); });
 }
 
+// testy
+void printSavedNetworks()
+{
+  if (!LittleFS.exists(networksFile))
+  {
+    Serial.println("Plik zapisanych sieci nie istnieje.");
+    return;
+  }
+
+  File file = LittleFS.open(networksFile, FILE_READ);
+  if (!file)
+  {
+    Serial.println("Nie udało się otworzyć pliku zapisanych sieci.");
+    return;
+  }
+
+  Serial.println("Zawartość pliku zapisanych sieci:");
+  while (file.available())
+  {
+    Serial.write(file.read());
+  }
+  file.close();
+}
+
 void setup()
 {
   Serial.begin(115200);
@@ -691,6 +715,7 @@ void setup()
     digitalWrite(ledPin, millis() % 1000 < 500 ? HIGH : LOW);
   }
 
+  printSavedNetworks();
   server.serveStatic("/", LittleFS, "/").setDefaultFile("index.html").setCacheControl("max-age=600");
   ServerSetupEndpoint();
   server.begin();
